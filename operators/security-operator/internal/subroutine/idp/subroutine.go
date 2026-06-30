@@ -194,9 +194,12 @@ func (s *subroutine) Process(ctx context.Context, obj ctrlruntimeclient.Object) 
 		}
 	}
 
+	managedUpstream := s.reconcileUpstreamIdentityProviders(ctx, idpConfig, adminClient, log)
+
 	// Update status
 	original := idpConfig.DeepCopy()
 	idpConfig.Status.ManagedClients = managedClients
+	idpConfig.Status.ManagedUpstreamIdentityProviders = managedUpstream
 	if err := kcpClient.Status().Patch(ctx, idpConfig, ctrlruntimeclient.MergeFrom(original)); err != nil {
 		return subroutines.OK(), fmt.Errorf("failed to patch IDP status: %w", err)
 	}
